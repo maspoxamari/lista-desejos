@@ -1,0 +1,28 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# Lista de desejos (inicialmente vazia)
+wishlist = []
+
+# Rota para adicionar um item na lista de desejos
+@app.route('/wishlist/items', methods=['POST'])
+def add_item():
+    item = request.json
+    wishlist.append(item)
+    return jsonify({'message': 'Item adicionado com sucesso!'})
+
+# Rota para remover um item da lista de desejos
+@app.route('/wishlist/items/<int:item_id>', methods=['DELETE'])
+def remove_item(item_id):
+    global wishlist
+    wishlist = [item for item in wishlist if item['id'] != item_id]
+    return jsonify({'message': 'Item removido com sucesso!'})
+
+# Rota para mostrar todos os itens da lista de desejos
+@app.route('/wishlist/items', methods=['GET'])
+def show_items():
+    return jsonify(wishlist)
+
+if __name__ == '__main__':
+    app.run()
