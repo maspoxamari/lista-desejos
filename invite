@@ -1,0 +1,40 @@
+from flask import Flask, request, jsonify
+import smtplib
+
+app = Flask(__name__)
+
+# Configurações do servidor de e-mail
+SMTP_SERVER = 'smtp.gmail.com'
+SMTP_PORT = 587
+SMTP_USERNAME = 'seu_email@gmail.com'
+SMTP_PASSWORD = 'sua_senha'
+
+# Rota para enviar convite por e-mail
+@app.route('/invite', methods=['POST'])
+def send_invite():
+    data = request.json
+
+    email = data['email']
+    subject = 'Convite para Amigo Secreto'
+    message = f'Olá {data["name"]}, você foi convidado para participar de um amigo secreto!'
+
+    try:
+        # Conecta ao servidor de e-mail
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+
+        # Cria o e-mail
+        email_message = f'Subject: {subject}\n\n{message}'
+
+        # Envia o e-mail
+        server.sendmail(SMTP_USERNAME, email, email_message)
+        server.quit()
+
+        return jsonify({'message': 'Convite enviado com sucesso!'})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run()
